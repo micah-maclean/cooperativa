@@ -1,0 +1,9 @@
+package com.micahmaclean.cooperativa.exception;
+
+import java.util.UUID;
+
+public class PautaNaoEncontradaException extends RuntimeException {
+    public PautaNaoEncontradaException(UUID id) {
+        super("Pauta não encontrada: " + id);
+    }
+}
