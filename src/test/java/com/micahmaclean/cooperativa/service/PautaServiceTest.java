@@ -3,8 +3,11 @@ package com.micahmaclean.cooperativa.service;
 import com.micahmaclean.cooperativa.dto.request.CriarPautaRequest;
 import com.micahmaclean.cooperativa.dto.request.EditarPautaRequest;
 import com.micahmaclean.cooperativa.exception.PautaNaoEncontradaException;
+import com.micahmaclean.cooperativa.exception.PautaTemSessaoException;
 import com.micahmaclean.cooperativa.model.Pauta;
+import com.micahmaclean.cooperativa.model.Sessao;
 import com.micahmaclean.cooperativa.repository.PautaRepository;
+import com.micahmaclean.cooperativa.repository.SessaoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,11 +29,15 @@ public class PautaServiceTest {
     @Mock
     private PautaRepository pautaRepository;
 
+    @Mock
+    private SessaoRepository sessaoRepository;
+
     private PautaService pautaService;
+
 
     @BeforeEach
     void setUp() {
-        pautaService = new PautaService(pautaRepository);
+        pautaService = new PautaService(pautaRepository, sessaoRepository);
     }
 
     @Test
@@ -95,6 +102,23 @@ public class PautaServiceTest {
         assertThatThrownBy(() -> pautaService.editar(id, request))
                 .isInstanceOf(PautaNaoEncontradaException.class);
 
+        verify(pautaRepository, never()).save(any());
+    }
+
+    @Test
+    void deveLancarExcecaoAoEditarPautaComSessao() {
+        UUID id = UUID.randomUUID();
+        Pauta pauta = new Pauta("Título antigo", "Descrição antiga");
+
+        when(pautaRepository.findById(id)).thenReturn(Optional.of(pauta));
+
+        Sessao sessao = new Sessao(pauta, 60);
+        when(sessaoRepository.findByPautaId(id)).thenReturn(Optional.of(sessao));
+
+        EditarPautaRequest request = new EditarPautaRequest("Novo Título", "Nova Descrição");
+
+        assertThatThrownBy(() -> pautaService.editar(id, request))
+                .isInstanceOf(PautaTemSessaoException.class);
         verify(pautaRepository, never()).save(any());
     }
 }

@@ -15,7 +15,16 @@ public final class SwaggerExemplos {
               "timestamp": "2026-07-16T12:38:05.948Z",
               "status": 404,
               "erro": "Not Found",
-              "mensagem": "Pauta não encontrada: 3fa85f64-5717-4562-b3fc-2c963f66afa6"
+              "mensagem": "Entidade não encontrada: 3fa85f64-5717-4562-b3fc-2c963f66afa6"
+            }
+            """;
+
+    public static final String ERRO_409 = """
+            {
+              "timestamp": "2026-07-16T12:38:05.948Z",
+              "status": 409,
+              "erro": "Conflict",
+              "mensagem": "O estado atual deste recurso não permite a alteração solicitada."
             }
             """;
 }
