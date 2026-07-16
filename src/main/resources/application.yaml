@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: cooperativa
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cooperativa
+    username: cooperativa
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
