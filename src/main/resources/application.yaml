@@ -12,3 +12,6 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+  user-info:
+    base-url: https://user-info.herokuapp.com
+    habilitado: false

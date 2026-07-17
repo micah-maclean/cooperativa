@@ -1,5 +1,6 @@
 package com.micahmaclean.cooperativa.service;
 
+import com.micahmaclean.cooperativa.client.ClienteInfoUsuario;
 import com.micahmaclean.cooperativa.dto.request.RegistrarVotoRequest;
 import com.micahmaclean.cooperativa.dto.response.ResultadoVotacaoResponse;
 import com.micahmaclean.cooperativa.exception.VotoDuplicadoException;
@@ -18,16 +19,22 @@ public class VotoService {
     private final VotoRepository votoRepository;
     private final SessaoService sessaoService;
     private final PautaService pautaService;
+    private final ClienteInfoUsuario clienteInfoUsuario;
 
-    public VotoService(VotoRepository votoRepository, SessaoService sessaoService, PautaService pautaService) {
+    public VotoService(VotoRepository votoRepository, SessaoService sessaoService, PautaService pautaService, ClienteInfoUsuario clienteInfoUsuario) {
         this.votoRepository = votoRepository;
         this.sessaoService = sessaoService;
         this.pautaService = pautaService;
+        this.clienteInfoUsuario = clienteInfoUsuario;
     }
 
     public Voto registrar(UUID pautaId, RegistrarVotoRequest request) {
-        Sessao sessao = sessaoService.buscarPorPautaId(pautaId);
+        ClienteInfoUsuario.RespostaInfoUsuario  info = clienteInfoUsuario.verificarElegibilidade(request.associadoId());
+        if (!"ABLE_TO_VOTE".equals(info.status())) {
+            throw new com.micahmaclean.cooperativa.exception.AssociadoNaoAptoException(request.associadoId());
+        }
 
+        Sessao sessao = sessaoService.buscarPorPautaId(pautaId);
         if (!sessao.estaAberta()) {
             throw new VotoEmSessaoFechadaException(sessao.getId());
         }

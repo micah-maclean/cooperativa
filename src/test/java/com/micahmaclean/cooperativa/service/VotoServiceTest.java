@@ -1,5 +1,6 @@
 package com.micahmaclean.cooperativa.service;
 
+import com.micahmaclean.cooperativa.client.ClienteInfoUsuario;
 import com.micahmaclean.cooperativa.dto.request.RegistrarVotoRequest;
 import com.micahmaclean.cooperativa.dto.response.ResultadoVotacaoResponse;
 import com.micahmaclean.cooperativa.exception.VotoDuplicadoException;
@@ -15,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,11 +36,14 @@ public class VotoServiceTest {
     @Mock
     private PautaService pautaService;
 
+    @Mock
+    private ClienteInfoUsuario clienteInfoUsuario;
+
     private VotoService votoService;
 
     @BeforeEach
     void setUp() {
-        votoService = new VotoService(votoRepository, sessaoService, pautaService);
+        votoService = new VotoService(votoRepository, sessaoService, pautaService, clienteInfoUsuario);
     }
 
     @Test
@@ -48,6 +53,7 @@ public class VotoServiceTest {
         Sessao sessao = new Sessao(pauta, 60);
         RegistrarVotoRequest request = new RegistrarVotoRequest("12345678901", Voto.VotoEnum.SIM);
 
+        when(clienteInfoUsuario.verificarElegibilidade("12345678901")).thenReturn(new ClienteInfoUsuario.RespostaInfoUsuario("ABLE_TO_VOTE"));
         when(sessaoService.buscarPorPautaId(pautaId)).thenReturn(sessao);
         when(votoRepository.existsByPautaIdAndAssociadoId(pautaId, "12345678901")).thenReturn(false);
         when(pautaService.buscarPorId(pautaId)).thenReturn(pauta);
@@ -67,6 +73,7 @@ public class VotoServiceTest {
         Sessao sessao = new Sessao(pauta, -1); // sessão expirada
         RegistrarVotoRequest request = new RegistrarVotoRequest("12345678901", Voto.VotoEnum.NAO);
 
+        when(clienteInfoUsuario.verificarElegibilidade("12345678901")).thenReturn(new ClienteInfoUsuario.RespostaInfoUsuario("ABLE_TO_VOTE"));
         when(sessaoService.buscarPorPautaId(pautaId)).thenReturn(sessao);
 
         assertThatThrownBy(() -> votoService.registrar(pautaId, request))
@@ -82,6 +89,7 @@ public class VotoServiceTest {
         Sessao sessao = new Sessao(pauta, 60);
         RegistrarVotoRequest request = new RegistrarVotoRequest("12345678901", Voto.VotoEnum.SIM);
 
+        when(clienteInfoUsuario.verificarElegibilidade("12345678901")).thenReturn(new ClienteInfoUsuario.RespostaInfoUsuario("ABLE_TO_VOTE"));
         when(sessaoService.buscarPorPautaId(pautaId)).thenReturn(sessao);
         when(votoRepository.existsByPautaIdAndAssociadoId(pautaId, "12345678901")).thenReturn(true);
 
@@ -94,6 +102,7 @@ public class VotoServiceTest {
     @Test
     void deveContabilizarResultado() {
         UUID pautaId = UUID.randomUUID();
+
         when(sessaoService.buscarPorPautaId(pautaId)).thenReturn(new Sessao(new Pauta("R", "A"), 60));
         when(votoRepository.contabilizarVotos(pautaId))
                 .thenReturn(Arrays.asList(
@@ -112,7 +121,7 @@ public class VotoServiceTest {
     void deveContabilizarComZeroVotos() {
         UUID pautaId = UUID.randomUUID();
         when(sessaoService.buscarPorPautaId(pautaId)).thenReturn(new Sessao(new Pauta("R", "A"), 60));
-        when(votoRepository.contabilizarVotos(pautaId)).thenReturn(Arrays.asList());
+        when(votoRepository.contabilizarVotos(pautaId)).thenReturn(List.of());
 
         ResultadoVotacaoResponse resultado = votoService.contabilizar(pautaId);
 

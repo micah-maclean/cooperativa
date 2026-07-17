@@ -51,6 +51,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(corpoErro(HttpStatus.BAD_REQUEST, ex.getMessage()));
     }
 
+    @ExceptionHandler(AssociadoNaoAptoException.class)
+    public ResponseEntity<ErroResponse> handleAssociadoNaoApto(AssociadoNaoAptoException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(corpoErro(HttpStatus.FORBIDDEN, ex.getMessage()));
+    }
+
+    @ExceptionHandler(AssociadoInvalidoException.class)
+    public ResponseEntity<ErroResponse> handleAssociadoInvalido(AssociadoInvalidoException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(corpoErro(HttpStatus.BAD_REQUEST, ex.getMessage()));
+    }
+
     private ErroResponse corpoErro(HttpStatus status, String mensagem) {
         return new ErroResponse(LocalDateTime.now(), status.value(), status.getReasonPhrase(), mensagem);
     }
