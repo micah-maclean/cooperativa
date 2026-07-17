@@ -41,6 +41,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(corpoErro(HttpStatus.NOT_FOUND, ex.getMessage()));
     }
 
+    @ExceptionHandler(VotoDuplicadoException.class)
+    public ResponseEntity<ErroResponse> handleVotoDuplicado(VotoDuplicadoException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(corpoErro(HttpStatus.CONFLICT, ex.getMessage()));
+    }
+
+    @ExceptionHandler(VotoEmSessaoFechadaException.class)
+    public ResponseEntity<ErroResponse> handleVotoEmSessaoFechada(VotoEmSessaoFechadaException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(corpoErro(HttpStatus.BAD_REQUEST, ex.getMessage()));
+    }
+
     private ErroResponse corpoErro(HttpStatus status, String mensagem) {
         return new ErroResponse(LocalDateTime.now(), status.value(), status.getReasonPhrase(), mensagem);
     }
