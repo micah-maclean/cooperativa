@@ -22,6 +22,12 @@ Usei **path variable** (`/v1/pautas`) em vez de headers ou content negotiation. 
 
 Cliente HTTP configurável (`user-info.base-url`, `user-info.habilitado`). Desabilitado por padrão (todos podem votar) — habilitar apenas se o serviço estiver disponível, evitando travamento de testes. Trata 404 e status `UNABLE_TO_VOTE` como rejeição.
 
+## Deploy Online
+
+A aplicação está deployada no **Railway** e disponível em:
+
+https://cooperativa-production-b9f1.up.railway.app/
+
 ## Rodando Localmente
 
 ### Pré-requisitos
