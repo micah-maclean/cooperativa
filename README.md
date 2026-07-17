@@ -126,15 +126,24 @@ Códigos HTTP:
 `application.yml`:
 
 ```yaml
+server:
+  port: ${PORT:8080}
+  forward-headers-strategy: framework
+
 spring:
+  application:
+    name: cooperativa
   datasource:
-    url: jdbc:postgresql://localhost:5432/cooperativa
-    username: cooperativa
-    password: postgres
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/cooperativa}
+    username: ${DB_USERNAME:cooperativa}
+    password: ${DB_PASSWORD:postgres}
   jpa:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
 
 user-info:
   base-url: https://user-info.herokuapp.com
